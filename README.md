@@ -31,7 +31,3 @@ Here's an example of how to use the module.  (Need to add explainers for options
 	});
 
 ````
-
-Example map
-
-![](https://i.imgur.com/reclHZt.png)
