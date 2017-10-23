@@ -4,9 +4,8 @@ Display your data in a d3 map/list ranking
 
 ## Data
 
-The file `measle_cases.csv` shows the fields required to generate the map list. 
+The file [measle_cases.csv](https://github.com/TimeMagazine/maplist/blob/master/data/example/measle_cases.csv)` shows the fields required to generate the map list. They are as follows:
 
-The code will look for the following fields in your CSV:
  1. state 
  2. state_full
  3. number (this is the number that the tool will sort states by, and will appear in tooltip)
