@@ -1,0 +1,323 @@
+.maplist {	
+
+	@mobile-max: 450px;
+	position: relative;
+	max-width: 600px;
+    text-align: center;
+    margin-bottom: 40px;
+    margin-top: 35px;
+    font-family: "franklin-gothic-urw",Helvetica,Arial,sans-serif;
+
+	
+	.interactive-head {
+		font-size: 22px;
+		margin: 12px 0px;
+		font-weight: 500;
+	}
+	.interactive-intro {
+		font-size: 17px;
+		padding: 0px 5px 10px 5px;
+		font-weight: 200;
+		line-height: 22px;
+		max-width: 600px;
+		margin: 0 auto;
+	}
+	.interactive-source {
+		font-size: 14px;
+		margin: 0;
+		padding: 6px 0px;
+		text-align: right
+	}
+	
+	#slider {
+		opacity: 0;
+	}
+	
+	#legend {
+	
+		div {
+			text-transform: uppercase;
+			color: #000;
+			font-size: 12px;
+			display: inline-block;
+			margin: 3px;
+			
+			span.block {
+				display: inline-block;
+				height: 15px;
+				width: 15px;
+				margin-right: 3px;
+				vertical-align: middle;
+			}
+
+			span.text {
+				margin-right: 10px;
+				vertical-align: middle;
+				font-size: 13px;
+    			font-weight: 200;
+			}
+		}
+	}
+	
+	.button-group{
+		margin: 0px 0px 20px 0px;
+	}
+	 ul {
+		margin: 0 auto;
+		padding: 32px 0 0px 0;
+	}
+	.button-group > li {
+		margin: 0;
+		float: left;
+	}
+	.button {
+		display: inline-block;
+		border-style: solid;
+		border-width: 1px;
+		cursor: pointer;
+		font-weight: normal;
+		line-height: normal;
+		position: relative;
+		text-decoration: none;
+		text-align: center;
+		-webkit-appearance: none;
+		-webkit-border-radius: 0;
+		display: inline-block;
+		padding: 10px 15px;
+		font-size: 0.88889rem;
+		background-color: #f9f9f9;
+		border-color: #bbb;
+		color: #000;
+		transition: background-color 300ms ease-out;
+		margin-left: -5px;
+		font-weight: bold;
+	}
+	.button:hover, .button:focus {
+		background-color: #ddd;
+	}
+	.button.active {
+		background: #ddd;
+	}
+	
+	@media (max-width: 500px) {
+		.button-group {
+			text-align: center;
+			float: none;
+			width: auto;
+		}
+		.button-group > li {
+			display: inline-block;
+			float: none;
+		}
+		ul {
+			padding: 8px 8px 10px 8px;
+		}
+	}	
+	
+	path.state {
+		fill: #fff;
+		stroke-width: 2;
+		stroke: #fff;
+		 -webkit-transition: opacity 0.5s ease-in-out;
+    	-moz-transition: opacity 0.5s ease-in-out;
+    	transition: opacity 0.5s ease-in-out;
+	}
+	text.category {
+		fill: #555;
+		font-size: 14px;
+		stroke-width: 2px;
+		text-transform: capitalize;
+		font-weight: 400;
+	}	
+	.label {
+		fill: #333;
+		stroke-width: 0;
+		font-size: 10px;
+		font-weight: 200;
+		cursor: default;
+		text-anchor: middle;
+	}
+	.label.large {
+		font-size: 20px;
+	}
+	
+	#summary {
+		padding: 0px 20px 20px 20px;
+		font-size: 18px;
+		width: auto;
+		margin: 0 auto;
+		border-bottom: 1px solid #999;
+		h2 {
+			font-size: 20px;
+			margin: 10px 0px;
+			font-weight: 500;
+			max-width: 100%;
+		}
+		.header {
+			font-weight: 400;
+ 			padding: 10px;
+ 			font-size: 16px;
+ 			border-bottom: 1px dashed #999;
+ 			width: 215px;
+ 			border-top: 1px dashed #999;
+ 			margin: 2px auto;
+		}
+		.details {
+			
+			h4 {
+				text-transform: capitalize;
+				margin: 10px 0px 10px 0px;
+				color: #444;
+				font-weight: 500;
+			}
+			.exp {
+				font-size: 16px;
+				font-weight: 200;
+			}
+		}
+	}
+	.smallblocks {
+        //background: #f2f2f2;
+        padding-left: 5px;
+        border-radius: 3px 0px 0px 3px;
+        
+        font-size: 13px;
+        .item {
+            margin: 4px 0px;
+            text-align: left;
+        }
+        //.item:hover {
+        //    .block {
+        //        border: 1px solid #000;
+        //    }
+        //}
+        span.block {
+            //border: 1px solid #eee;
+            display: inline-block;
+            padding: 8px;
+            vertical-align: middle;
+        }
+        span.state {
+            vertical-align: middle;
+        }
+    }
+	#smallstates {
+        position: absolute;
+        top: 50%;
+        right: 8px;
+    }
+    // for mobile
+    @media (max-width: @mobile-max) {
+        
+        .big_text {
+            font-size: 30px;
+            margin-bottom: -20px;
+            .text-right {
+                margin-left: -5px;
+            }
+        }
+        #smallstates {
+            background: none;
+            font-size: 11px;
+            position: relative !important;
+            display: inline-block;
+            padding: 6px;
+            width: 100%;
+            margin: 0 auto;
+            right: auto;
+            top: auto;
+            text-align: center;
+            .item {
+                display: inline-block;
+                margin: 2px;
+                margin-right: 3px;
+            }
+            span.block {
+                padding: 7px;
+                margin-right: -2px;
+            }
+        }
+    }
+    
+}
+// for tooltips
+.tip {
+    border: 1px solid #bbb;
+    font-size: 15px;
+    @media(max-width:550px){
+        font-size: 14px;
+    }
+    background: #fff;
+    padding: 8px;
+    width: 165px;
+    font-weight: 200;
+
+
+    .rising {
+        color: #da704a;
+    }
+    .same {
+        color: #777;
+    }
+    .falling {
+        color:  #5c949e;
+    }
+    .close {
+        position: absolute;
+        right: 8px;
+        top: 6px;
+        font-size: 22px;
+        color: #444;
+        display: none; 
+        @media(max-width:550px){
+            display: block;
+        }
+    }
+    .overall {
+    	
+    	margin: 6px 0px;
+    }
+    .details {
+    	margin: 12px 0px 5px 0px;
+    	border-bottom: 1px solid #ddd;
+    }
+    .pct {
+        padding-top: 5px;
+        font-weight: 500;
+    }
+    .top {
+        //border-bottom: 1px dashed #333;
+        margin-bottom: 5px;
+    }
+    .state_name {
+        font-size: 15px;
+        text-transform: capitalize;
+        font-weight: 500;
+        color: #444;
+        padding-bottom: 2px;
+    }
+    table {
+        font-weight: 200;
+        width: 100%;
+        border-collapse: collapse;
+        tr {
+            td {   
+                width: table-cell;
+                padding: 5px 0px;
+                border-bottom: 1px solid #ddd;
+            }
+            td:last-child {
+                text-align: right;
+            }
+        }
+        tr:last-child {
+            td {
+                border-bottom: none;
+            }
+        }
+    }
+}
+.d3tooltip {
+    position: absolute;
+    font-family: "franklin-gothic-urw", Helvetica, Arial, sans-serif;
+}

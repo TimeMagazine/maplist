@@ -1,0 +1,314 @@
+{
+  "details": {
+    "headline": "Measles Cases by State, 2011-2015",
+    "subhead": "",
+    "source": "Centers for Disease Control and Prevention",
+    "sourcehref": ""
+  },
+  "AK": {
+    "state": "Arkansas",
+    "rank": "41",
+    "num": "1",
+    "domain": "<10"
+  },
+  "AL": {
+    "state": "Alabama",
+    "rank": "24",
+    "num": "13",
+    "domain": "10+"
+  },
+  "AR": {
+    "state": "Arizona",
+    "rank": "32",
+    "num": "6",
+    "domain": "<10"
+  },
+  "AZ": {
+    "state": "Arizona",
+    "rank": "15",
+    "num": "33",
+    "domain": "10+"
+  },
+  "CA": {
+    "state": "California",
+    "rank": "2",
+    "num": "380",
+    "domain": "100+"
+  },
+  "CO": {
+    "state": "Colorado",
+    "rank": "33",
+    "num": "6",
+    "domain": "<10"
+  },
+  "CT": {
+    "state": "Connecticut",
+    "rank": "28",
+    "num": "9",
+    "domain": "<10"
+  },
+  "DC": {
+    "state": "District of Columbia",
+    "rank": "31",
+    "num": "8",
+    "domain": "<10"
+  },
+  "DE": {
+    "state": "Delaware",
+    "rank": "35",
+    "num": "4",
+    "domain": "<10"
+  },
+  "FL": {
+    "state": "Florida",
+    "rank": "13",
+    "num": "40",
+    "domain": "10+"
+  },
+  "GA": {
+    "state": "Georgia",
+    "rank": "25",
+    "num": "12",
+    "domain": "10+"
+  },
+  "HI": {
+    "state": "Hawaii",
+    "rank": "9",
+    "num": "57",
+    "domain": "50+"
+  },
+  "IA": {
+    "state": "Iowa",
+    "rank": "34",
+    "num": "5",
+    "domain": "<10"
+  },
+  "ID": {
+    "state": "Idaho",
+    "rank": "42",
+    "num": "1",
+    "domain": "<10"
+  },
+  "IL": {
+    "state": "Illinois",
+    "rank": "6",
+    "num": "68",
+    "domain": "50+"
+  },
+  "IN": {
+    "state": "Indiana",
+    "rank": "5",
+    "num": "72",
+    "domain": "50+"
+  },
+  "KS": {
+    "state": "Kansas",
+    "rank": "18",
+    "num": "27",
+    "domain": "10+"
+  },
+  "KY": {
+    "state": "Kentucky",
+    "rank": "36",
+    "num": "4",
+    "domain": "<10"
+  },
+  "LA": {
+    "state": "Lousiana",
+    "rank": "43",
+    "num": "1",
+    "domain": "<10"
+  },
+  "MA": {
+    "state": "Massachusetts",
+    "rank": "7",
+    "num": "66",
+    "domain": "50+"
+  },
+  "MD": {
+    "state": "Maryland",
+    "rank": "22",
+    "num": "14",
+    "domain": "10+"
+  },
+  "ME": {
+    "state": "Maine",
+    "rank": "49",
+    "num": "0",
+    "domain": "<10"
+  },
+  "MI": {
+    "state": "Michigan",
+    "rank": "19",
+    "num": "25",
+    "domain": "10+"
+  },
+  "MN": {
+    "state": "Minnesota",
+    "rank": "12",
+    "num": "44",
+    "domain": "10+"
+  },
+  "MO": {
+    "state": "Missouri",
+    "rank": "11",
+    "num": "48",
+    "domain": "10+"
+  },
+  "MS": {
+    "state": "Mississippi",
+    "rank": "48",
+    "num": "0",
+    "domain": "<10"
+  },
+  "MT": {
+    "state": "Montana",
+    "rank": "50",
+    "num": "0",
+    "domain": "<10"
+  },
+  "NC": {
+    "state": "North Carolina",
+    "rank": "16",
+    "num": "31",
+    "domain": "10+"
+  },
+  "ND": {
+    "state": "North Dakota",
+    "rank": "44",
+    "num": "1",
+    "domain": "<10"
+  },
+  "NE": {
+    "state": "Nebraska",
+    "rank": "37",
+    "num": "4",
+    "domain": "<10"
+  },
+  "NH": {
+    "state": "New Hampshire",
+    "rank": "38",
+    "num": "4",
+    "domain": "<10"
+  },
+  "NJ": {
+    "state": "New Jersey",
+    "rank": "14",
+    "num": "40",
+    "domain": "10+"
+  },
+  "NM": {
+    "state": "New Mexico",
+    "rank": "29",
+    "num": "9",
+    "domain": "<10"
+  },
+  "NV": {
+    "state": "Nevada",
+    "rank": "26",
+    "num": "12",
+    "domain": "10+"
+  },
+  "NY": {
+    "state": "New York",
+    "rank": "3",
+    "num": "250",
+    "domain": "100+"
+  },
+  "OH": {
+    "state": "Ohio",
+    "rank": "1",
+    "num": "396",
+    "domain": "100+"
+  },
+  "OK": {
+    "state": "Oklahoma",
+    "rank": "45",
+    "num": "1",
+    "domain": "<10"
+  },
+  "OR": {
+    "state": "Oregon",
+    "rank": "17",
+    "num": "28",
+    "domain": "10+"
+  },
+  "PA": {
+    "state": "Pennsylvania",
+    "rank": "8",
+    "num": "59",
+    "domain": "50+"
+  },
+  "RI": {
+    "state": "Rhode Island",
+    "rank": "39",
+    "num": "2",
+    "domain": "<10"
+  },
+  "SC": {
+    "state": "South Carolina",
+    "rank": "51",
+    "num": "0",
+    "domain": "<10"
+  },
+  "SD": {
+    "state": "South Dakota",
+    "rank": "27",
+    "num": "10",
+    "domain": "10+"
+  },
+  "TN": {
+    "state": "Tennessee",
+    "rank": "30",
+    "num": "9",
+    "domain": "<10"
+  },
+  "TX": {
+    "state": "Texas",
+    "rank": "10",
+    "num": "57",
+    "domain": "50+"
+  },
+  "UT": {
+    "state": "Utah",
+    "rank": "20",
+    "num": "18",
+    "domain": "10+"
+  },
+  "VA": {
+    "state": "Virginia",
+    "rank": "21",
+    "num": "17",
+    "domain": "10+"
+  },
+  "VT": {
+    "state": "Vermont",
+    "rank": "40",
+    "num": "2",
+    "domain": "<10"
+  },
+  "WA": {
+    "state": "Washington",
+    "rank": "4",
+    "num": "102",
+    "domain": "100+"
+  },
+  "WI": {
+    "state": "Wisconsin",
+    "rank": "23",
+    "num": "14",
+    "domain": "10+"
+  },
+  "WV": {
+    "state": "West Virginia",
+    "rank": "46",
+    "num": "1",
+    "domain": "<10"
+  },
+  "WY": {
+    "state": "Wyoming",
+    "rank": "47",
+    "num": "1",
+    "domain": "<10"
+  }
+}
