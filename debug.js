@@ -6,7 +6,7 @@ var d3 = require('d3'),  // need to reduce to d3-geo
 
 require("./src/styles.less");
 
-var mapList = function(container, opts) {
+var mapList = async function(container, opts) {
 	
 	if (!container) {
 		console.log("You must supply mapList a container as the first argument");
@@ -39,9 +39,52 @@ var mapList = function(container, opts) {
 		console.log("You must supply data for the ranking tool");
 		return null;
 	};
+
+	function fetchData(url){
+		return new Promise((resolve, reject) => {
+			if(url.endsWith('json')) {
+				d3.json(url), (d) => {
+					resolve(d)
+				};
+			}
+			else if(url.endsWith('csv')) {
+				d3.csv(url, (d) => {
+					resolve(d) 
+				});
+			}
+			else {
+				throw(`Invalid data file provided ${opts.data}`)
+				reject()
+			}
+		})
+	}
+
+	if (typeof(opts.data) == 'string') {
+		opts.data = await fetchData(opts.data)
+	}
+	
+	let data_field = opts.data_field || 'number';
+	let value_sort_func = opts.sortValues == 'descending' ? d3.descending : d3.ascending
+	let state_sort_func = opts.sortStates == 'descending' ? d3.descending : d3.ascending
+
+	opts.data = opts.data.map(d => {
+		if (opts.data_parse_dangerously){				
+			let val = d[data_field]
+			d[data_field] = Number(val.replace(/[^0-9\.-]+/g,""));
+		}
+		if (opts.strFormat){
+			d['number_fmt'] = opts.strFormat(d[data_field])
+		}
+		else d['number_fmt'] = str(d[data_field])
+		return d
+	})
+	
 	var data = opts.data.sort(function(a,b){
-		return parseFloat(a.number) - parseFloat(b.number);
+		return value_sort_func(parseFloat(a[data_field]),parseFloat(b[data_field]))
+		//return parseFloat(a[data_field]) - parseFloat(b[data_field]);
 	});
+
+		
 	var dataObject = {};
 	data.forEach(function(d, i){
 		dataObject[d.state] = d;
@@ -101,7 +144,7 @@ var mapList = function(container, opts) {
 	// LEGENDS
 	var legendDomain = opts.legend_domain ? opts.legend_domain : ['Bottom 20%','20%+','40%+', '60%+', 'Top 20%'];
 
-	var div = select(container + ' #legend');
+	var div = select(container + ' .legend');
 	div.selectAll(".item")
 		.data(legendDomain)
 		.enter()
@@ -123,13 +166,22 @@ var mapList = function(container, opts) {
 
 	var smallStates = opts.smallstates ? opts.smallstates :['MA','CT','RI','DE','MD','DC'];
 
+	if (opts.dc && !dataObject.hasOwnProperty('DC')) throw 'Washington, D.C. is included but data is missing.';
+	
+	smallStates = smallStates.filter(d => {
+		return dataObject.hasOwnProperty(d)
+	});
+
+	states.features = states.features.filter(d => {
+		return dataObject.hasOwnProperty(d.properties.name)		
+	});
 
 	states = states.features.sort(function(a,b){
-		return dataObject[a.properties.name].rank - dataObject[b.properties.name].rank 
+		return state_sort_func(dataObject[b.properties.name].rank, dataObject[a.properties.name].rank);
 	});
 
 	// ************ Svg and its contents ************** //
-	var b = elasticSvg(container +  " #map", {
+	var b = elasticSvg(container +  " .map", {
 		onResize: function(w, h, s) {
 			render(w,h);
 		}
@@ -164,7 +216,7 @@ var mapList = function(container, opts) {
 			}
 		)
 
-	var smallStatesDiv = select(container+' #smallstates');
+	var smallStatesDiv = select(container+' .smallstates');
 	smallStatesDiv.selectAll('.item')
 		.data(smallStates)
 		.enter()
@@ -212,7 +264,7 @@ var mapList = function(container, opts) {
 		.attr('class','category')
 		.style('opacity', 0)
 		.text(function(d, i){
-			return dataObject[d.properties.name].number;
+			return dataObject[d.properties.name].number_fmt;
 		});
 
 	// ************ Render both views **************** //
@@ -226,9 +278,9 @@ var mapList = function(container, opts) {
 	})
 
 	function render(width, ht) {			
-
 		// Map
-		var secondClass = select('.button-group #second').attr('class');
+		var secondClass = select(container + ' .button-group .second').attr('class');
+		
 		if (secondClass.indexOf('active') > -1){
 			// Hide categories
 			categories
@@ -249,6 +301,7 @@ var mapList = function(container, opts) {
 				.style('stroke-width',1.5)
 			
 			// Resize state stateLabels
+			let translateT = 0;
 			stateLabels
 				.transition().duration(1800)
 				.attr("y",0)
@@ -265,14 +318,14 @@ var mapList = function(container, opts) {
 			 	});
 
 			// Bring up position of summary section
-			select(container+ '#map svg').transition().duration(1000).attr('height', width * 0.65);
-
+			select(container+ ' .map svg').transition().duration(1000).attr('height', width * 0.65);
+			
 			var mapScale = width/(oldMapWidth)// +  chPadding.right + chPadding.left);
 		
 			parentGroup.attr("transform", function(d) { 
 				return "translate("+chPadding.left/2+","+chPadding.top+")scale("+ mapScale +")"
 			})
-			select('#smallstates')
+			select(container+' .smallstates')
 				.transition().duration(200)
 				.style('opacity', 1)
 	
@@ -281,7 +334,7 @@ var mapList = function(container, opts) {
 			// parentGroup.attr("transform", function(d) { 
 			// 	return "translate("+chPadding.left+","+chPadding.top+")scale(1)"
 			// })
-			select('#smallstates')
+			select(container+' .smallstates')
 				.transition().duration(200)
 				.style('opacity', 0)
 
@@ -350,7 +403,7 @@ var mapList = function(container, opts) {
 				.transition().duration(500).delay(800)
 				.style('opacity', 1)
 
-			select(container+ ' #map svg').transition().attr('height', ((step+ 1) * block ));
+			select(container+ ' .map svg').transition().attr('height', ((step+ 1) * block ));
 		}
 	}
 
@@ -376,14 +429,16 @@ var mapList = function(container, opts) {
 	var buttons = d3.selectAll(container + ' li.button');
 
 	buttons.on('click',function(d){
-		buttons.attr('class','button')
-		select(this).attr('class','button active')
+		buttons.classed('button', true)
+		buttons.classed('active', false)
+
+		d3.select(this).classed("active", !d3.select(this).classed("active"))
 		render(width);
 	});
 
 	// First click 
 	setTimeout(function(){
-		select('.button-group #first').dispatch("click");
+		select(container +' .button-group .first').dispatch("click");
 	},200);
 
 	// return {
@@ -397,4 +452,4 @@ function is_touch_device() {
         || navigator.maxTouchPoints; // works on IE10/11 and Surface
 };
 
-export { mapList as mapList };
+export default mapList

@@ -4,26 +4,35 @@
 		<meta charset="utf-8">
 		<title>Map list example</title>
 		<style>
-.container {
-	max-width: 600px;
-	width: 100%;
-}
+			.container {
+				max-width: 600px;
+				width: 100%;
+			}
 		</style>
 	</head>
 	<body>
-		<div class="container" id="container"></div>
+		<div class="container" id="vaginal"></div>
 		
-		<script src="maplist.js" charset="utf-8"></script>
+		<script src="script.js" charset="utf-8"></script>
 		<!-- <script src="index.js" charset="utf-8"></script> -->
 		<script>
-			console.log(this.mapList)
-	var map = this.mapList("#container", {
-		// aspect: 1,
-		// resize: "auto"
-	});
-	// b1.svg.innerHTML = path;
-
-
+			var map = TIMEMapList.default("#vaginal", {
+				data: './data/example/childbirth_allowed_vaginal.csv',
+				data_field: 'Average',
+				data_parse_dangerously: true,
+				tooltip_title: 'Average Price for Vaginal Delivery',
+				scale: 'ordinal',
+				width: 600,
+				headline: 'Average Price for Vaginal Delivery',
+				intro: '',
+				source: 'FAIR Health',
+				sourcelink: 'https://www.fairhealth.org/',
+				strFormat: (d) => {return `$${Number(d.toFixed(0)).toLocaleString()}`},
+				legend_domain: ['Top 20%','20%+','40%+', '60%+', 'Bottom 20%'],
+				sortValues: 'ascending', //Rank most expensive as 1
+				sortStates: 'ascending', //Show most expensive to least expensive
+				dc: true
+			});
 		</script>
 	</body>
 </html>
