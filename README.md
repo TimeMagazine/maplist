@@ -10,14 +10,25 @@ The file [childbirth_allowed_vaginal.csv](https://github.com/TimeMagazine/maplis
 
 Here's an example of how to use the module.  (Need to add explainers for options)
 
+In node:
 ``` 
-	var mapList = mapList = require('./lib/maplist').mapList;
-	var data = require('./data/measle_cases.csv');
+	import mapList from './lib/maplist';
 ```
 
-```
+In browser:
+
+1. Build:
+```	
+	npm run build
 ```
 
+2. Import
+```
+	<script src="script.js" charset="utf-8"></script>
+	var map = TIMEMapList.default("#container", options)
+```
+
+Available Options:
 ```			
 	options = {
 		data: './data/example/childbirth_allowed_vaginal.csv', // You can pass in URL or Array
