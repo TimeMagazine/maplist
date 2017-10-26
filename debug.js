@@ -1,8 +1,6 @@
-import {select, event, mouse} from "d3-selection";
-
-var d3 = require('d3'),  // need to reduce to d3-geo
-	topojson = require('topojson'),
-	elasticSvg = require('elastic-svg');
+import * as d3 from 'd3'
+import * as topojson from 'topojson'
+import * as elasticSvg from 'elastic-svg'
 
 require("./src/styles.less");
 
@@ -26,7 +24,7 @@ var mapList = async function(container, opts) {
 		console.log("You must supply mapList with a headline");
 		return null;
 	}
-	var element = select(container).html(templates.base(opts));
+	var element = d3.select(container).html(templates.base(opts));
 	element.attr('class','maplist') // this applies the CSS
 
 	// SCALE
@@ -102,7 +100,7 @@ var mapList = async function(container, opts) {
 	};
 
 	// TOOLTIP AND ITS BEHAVIOR
-	var tooltip = select("body")
+	var tooltip = d3.select("body")
 		.append("div").classed("d3tooltip", true)
 		.on('click',function(d){ tooltip.style("visibility", "hidden");});
 
@@ -144,7 +142,7 @@ var mapList = async function(container, opts) {
 	// LEGENDS
 	var legendDomain = opts.legend_domain ? opts.legend_domain : ['Bottom 20%','20%+','40%+', '60%+', 'Top 20%'];
 
-	var div = select(container + ' .legend');
+	var div = d3.select(container + ' .legend');
 	div.selectAll(".item")
 		.data(legendDomain)
 		.enter()
@@ -188,7 +186,7 @@ var mapList = async function(container, opts) {
 	});
 
 	// Create parent group to translate
-	var parentGroup = select(b.svg).append("g")
+	var parentGroup = d3.select(b.svg).append("g")
 		.attr('class','parentgroup')
 
 
@@ -216,7 +214,7 @@ var mapList = async function(container, opts) {
 			}
 		)
 
-	var smallStatesDiv = select(container+' .smallstates');
+	var smallStatesDiv = d3.select(container+' .smallstates');
 	smallStatesDiv.selectAll('.item')
 		.data(smallStates)
 		.enter()
@@ -270,7 +268,7 @@ var mapList = async function(container, opts) {
 	// ************ Render both views **************** //
 
 	// Original map width
-	var oldMapWidth = select(b.svg).node().getBBox().width;
+	var oldMapWidth = d3.select(b.svg).node().getBBox().width;
 	var scales = {}
 
 	parentGroup.attr("transform", function(d) { 
@@ -279,7 +277,7 @@ var mapList = async function(container, opts) {
 
 	function render(width, ht) {			
 		// Map
-		var secondClass = select(container + ' .button-group .second').attr('class');
+		var secondClass = d3.select(container + ' .button-group .second').attr('class');
 		
 		if (secondClass.indexOf('active') > -1){
 			// Hide categories
@@ -318,14 +316,14 @@ var mapList = async function(container, opts) {
 			 	});
 
 			// Bring up position of summary section
-			select(container+ ' .map svg').transition().duration(1000).attr('height', width * 0.65);
+		 d3.select(container+ ' .map svg').transition().duration(1000).attr('height', width * 0.65);
 			
 			var mapScale = width/(oldMapWidth)// +  chPadding.right + chPadding.left);
 		
 			parentGroup.attr("transform", function(d) { 
 				return "translate("+chPadding.left/2+","+chPadding.top+")scale("+ mapScale +")"
 			})
-			select(container+' .smallstates')
+		 d3.select(container+' .smallstates')
 				.transition().duration(200)
 				.style('opacity', 1)
 	
@@ -334,7 +332,7 @@ var mapList = async function(container, opts) {
 			// parentGroup.attr("transform", function(d) { 
 			// 	return "translate("+chPadding.left+","+chPadding.top+")scale(1)"
 			// })
-			select(container+' .smallstates')
+		 d3.select(container+' .smallstates')
 				.transition().duration(200)
 				.style('opacity', 0)
 
@@ -403,7 +401,7 @@ var mapList = async function(container, opts) {
 				.transition().duration(500).delay(800)
 				.style('opacity', 1)
 
-			select(container+ ' .map svg').transition().attr('height', ((step+ 1) * block ));
+		 d3.select(container+ ' .map svg').transition().attr('height', ((step+ 1) * block ));
 		}
 	}
 
@@ -438,7 +436,7 @@ var mapList = async function(container, opts) {
 
 	// First click 
 	setTimeout(function(){
-		select(container +' .button-group .first').dispatch("click");
+	 d3.select(container +' .button-group .first').dispatch("click");
 	},200);
 
 	// return {
