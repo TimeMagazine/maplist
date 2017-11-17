@@ -27,6 +27,11 @@ var mapList = async function(container, opts) {
 	var element = d3.select(container).html(templates.base(opts));
 	element.attr('class','maplist') // this applies the CSS
 
+	// If on mobile with world map, hide the world map (too big for mobile)
+	if (opts.world && is_touch_device()){
+		d3.select(container + ' ul.button-change').style('display','none')
+	};
+
 	// SCALE
 	var color = opts.scale == 'linear' ? d3.scaleLinear() : d3.scaleOrdinal()
 		.domain(opts.domain ? opts.domain : ['0.2','0.4','0.6','0.8','1'])
@@ -76,27 +81,42 @@ var mapList = async function(container, opts) {
 		else d['number_fmt'] = str(d[data_field])
 		return d
 	})
-	
+
+
 	var data = opts.data.sort(function(a,b){
-		return value_sort_func(parseFloat(a[data_field]),parseFloat(b[data_field]))
+		return value_sort_func(parseFloat(a[data_field]), parseFloat(b[data_field]))
 		//return parseFloat(a[data_field]) - parseFloat(b[data_field]);
 	});
-
 		
+	if (opts.world){
+		var crossWalk = {};
+		// cleanup to require just in object version
+		require('./data/csv/country_codes.csv').forEach(function(d){
+			crossWalk[d.name] = d.country_code.length == 2? '0'+d.country_code :d.country_code
+		});
+	};
+
 	var dataObject = {};
 	data.forEach(function(d, i){
-		dataObject[d.state] = d;
-		dataObject[d.state].rank = i+1;
-		dataObject[d.state].color = getColor(i); // Find state's percentile based on rank;
-		dataObject[d.state].tooltip_title = opts.tooltip_title ? opts.tooltip_title : 'Number of cases'
+		
+		var key = opts.world ? crossWalk[d.state] : d.state;
+		dataObject[key] = d;
+		dataObject[key].rank = i+1;
+		dataObject[key].color = getColor(i); // Find state's percentile based on rank;
+		dataObject[key].tooltip_title = opts.tooltip_title ? opts.tooltip_title : 'Number of cases'
 	});
 
 	function getColor(i){
-		var result = '';
-		color.domain().reverse().forEach(function(d){
-			if ((i/51) < parseFloat(d)){ result = color(d) } 
-		});
-		return result;
+		if (opts.scale == 'ordinal'){
+			var result = '';
+			color.domain().reverse().forEach(function(d){
+				// if ((i/data.length) < parseFloat(d)){ result = color(d) } 
+				if (i < parseFloat(d)){ result = color(d) } 
+			});
+			return result;
+		} else {
+			return color(i);
+		}
 	};
 
 	// TOOLTIP AND ITS BEHAVIOR
@@ -134,9 +154,9 @@ var mapList = async function(container, opts) {
 		return this;
     };
 
-	var chPadding =  {top: 20, right: 15, bottom: 20, left: 15},
+	var chPadding =  {top: 45, right: 15, bottom: 20, left: 15},
 		width = opts.width,
-		height = width * 0.72,
+		height = width * 0.6,
 		scale = width/.75;
 
 	// LEGENDS
@@ -149,20 +169,27 @@ var mapList = async function(container, opts) {
 		.append("div")
 		.html(function(d,i){
 			// Need to add heatmap style legend for linear rankings, this only supports ordinal 
-			return '<span class="block" style="background-color:'+color.range()[4-i]+';"></span><span class="text">'+d+'</span>'
+			return '<span class="block" style="background-color:'+color.range()[i]+';"></span><span class="text">'+d+'</span>'
 		});
 
 	// GEOGRAPHY
-	var geo = require(opts.dc ? './data/json/states.json' : './data/json/states_nodc.json'),
-		labelPositions = require('./data/json/statelabels.json');
-	var states = topojson.feature(geo, geo.objects.us_states);
+	var geo = opts.world ? require('./data/json/world-50m.json') : require(opts.dc ? './data/json/states.json' : './data/json/states_nodc.json'),
+		labelPositions = opts.world ? undefined : require('./data/json/statelabels.json') ;
+	var states = topojson.feature(geo, opts.world ? geo.objects.countries : geo.objects.us_states);
 	
-	var projection = d3.geoAlbersUsa()
-		.translate([width / 2, height / 2.75])
-		.scale(scale);
+	if (opts.world){
+		var projection = d3.geoMercator() //: d3.geoAlbersUsa()
+			.translate([width / 2.35, height / 1.75])
+			.scale(width/5.5);
+	} else {
+		var projection = d3.geoAlbersUsa()
+			.translate(opts.world ? [width / 2, height / 2.2] : [width / 2, height / 2.75])
+			// .scale(100);
+	}
+	
 	var path = d3.geoPath().projection(projection);
 
-	var smallStates = opts.smallstates ? opts.smallstates :['MA','CT','RI','DE','MD','DC'];
+	var smallStates = opts.world ? [] : opts.smallstates ? opts.smallstates :['MA','CT','RI','DE','MD','DC'];
 
 	if (opts.dc && !dataObject.hasOwnProperty('DC')) throw 'Washington, D.C. is included but data is missing.';
 	
@@ -170,18 +197,26 @@ var mapList = async function(container, opts) {
 		return dataObject.hasOwnProperty(d)
 	});
 
-	states.features = states.features.filter(d => {
-		return dataObject.hasOwnProperty(d.properties.name)		
-	});
+	if (!opts.world){
+		// Filter out states for which we have no data
+		states.features = states.features.filter(d => {
+			return dataObject.hasOwnProperty(d.properties.name)
+		});
+	} else {
+		states.features.forEach(function(d){
+			d.rank = dataObject[d.id] ? dataObject[d.id].rank : data.length + 1;
+		})
+	}
 
 	states = states.features.sort(function(a,b){
-		return state_sort_func(dataObject[b.properties.name].rank, dataObject[a.properties.name].rank);
+		return opts.world ? state_sort_func(b.rank, a.rank) : state_sort_func(dataObject[b.properties.name].rank, dataObject[a.properties.name].rank);
 	});
 
 	// ************ Svg and its contents ************** //
 	var b = elasticSvg(container +  " .map", {
+		width: width,
 		onResize: function(w, h, s) {
-			render(w,h);
+			render(w,h)
 		}
 	});
 
@@ -189,26 +224,37 @@ var mapList = async function(container, opts) {
 	var parentGroup = d3.select(b.svg).append("g")
 		.attr('class','parentgroup')
 
-
 	// States
 	var group = parentGroup.selectAll("g")
 		.data(states)
 		.enter()
 		.append("g")
-		.attr('class','group')
+		.attr('class', function(d){
+			if (opts.world){
+				return dataObject.hasOwnProperty(d.id) ? 'yes group' : 'no group'
+			} else {
+				return 'group'
+			}			
+		});
 
 	var statesSVG = group.append("svg:path")
 		.attr('d', path)
 		.style('fill', function(d) {
-			return dataObject[d.properties.name].color;
+			return opts.world ? dataObject[d.id] ? dataObject[d.id].color : '#ddd' : dataObject[d.properties.name].color;
 		})
 		.attr('class', function(d) {
 			d.bounds = this.getBBox();
-			return 'state'
+			return 'state';
 		})
 		.tooltip(
 			function(d, i, obj){
-				return templates.tooltip(dataObject[d.properties.name]);
+				if (opts.world){
+					if (dataObject[d.id]){
+						return templates.tooltip(dataObject[d.id]);	
+					}
+				} else {
+					return templates.tooltip(dataObject[d.properties.name]);
+				}
 			},
 			function() {
 			}
@@ -235,7 +281,8 @@ var mapList = async function(container, opts) {
 	var stateLabels = group.append("text")
 		// .text(function(d){ return smallStates.indexOf(d.properties.name) > -1 ? '' : d.properties.name })
 		.text(function(d){
-			if (d.properties) {return d.properties.name} })
+			if (!opts.world && d.properties) {return d.properties.name}
+		})
 		.attr('transform',function(d){
 			d.box = this.getBBox();
 			d.path = path.centroid(d);
@@ -262,13 +309,14 @@ var mapList = async function(container, opts) {
 		.attr('class','category')
 		.style('opacity', 0)
 		.text(function(d, i){
-			return dataObject[d.properties.name].number_fmt;
-		});
+			return opts.world ? dataObject[d.id] ? dataObject[d.id].state : '' : dataObject[d.properties.name].number_fmt;
+		})
+		.call(wrap, 65)			
 
 	// ************ Render both views **************** //
 
 	// Original map width
-	var oldMapWidth = d3.select(b.svg).node().getBBox().width;
+	var oldMapWidth = d3.select(b.svg).node().getBBox().width
 	var scales = {}
 
 	parentGroup.attr("transform", function(d) { 
@@ -280,12 +328,17 @@ var mapList = async function(container, opts) {
 		var secondClass = d3.select(container + ' .button-group .second').attr('class');
 		
 		if (secondClass.indexOf('active') > -1){
+		
 			// Hide categories
 			categories
 				.transition().duration(200)
 				.style('opacity', 0)
+				.transition().delay(2000)
+				.attr("transform", function(d) { 
+					return "translate(0,0)";
+				})
 		
-			// Reset positoin of state groups
+			// Reset position of state groups
 			group
 				.transition().duration(1800)
 				.style("stroke-width", 1.5)  
@@ -296,55 +349,76 @@ var mapList = async function(container, opts) {
 			// Restore state borders
 			statesSVG
 				.attr('opacity', 1)
-				.style('stroke-width',1.5)
+				.style('stroke-width', 1)
 			
 			// Resize state stateLabels
-			let translateT = 0;
-			stateLabels
-				.transition().duration(1800)
-				.attr("y",0)
-				.attr("opacity",function(d){
-					return is_touch_device() ||  smallStates.indexOf(d.properties.name) > -1 ? 0 : 1;
-				})
-			 	.attr("transform", function(d, i) {
-			 		var state = d.properties.name;
-			 		if (labelPositions[state]){
-						return "translate(" + (d.path[0] +  labelPositions[state].x) + "," + (d.path[1] + labelPositions[state].y) + ")rotate(" + labelPositions[state].r  + ")";
-					} else {
-						return "translate("+ d.path[0] + ","+ d.path[1]+")scale(" + 1 + ")"; 
-					};                
-			 	});
+			if (!opts.world){
+				let translateT = 0;
+				stateLabels
+					.transition().duration(1800)
+					.attr("y",0)
+					.attr("opacity",function(d){
+						return is_touch_device() ||  smallStates.indexOf(d.properties.name) > -1 ? 0 : 1;
+					})
+				 	.attr("transform", function(d, i) {
+				 		var state = d.properties.name;
+				 		if (!opts.world && labelPositions[state]){
+							return "translate(" + (d.path[0] +  labelPositions[state].x) + "," + (d.path[1] + labelPositions[state].y) + ")rotate(" + labelPositions[state].r  + ")";
+						} else {
+							return "translate("+ d.path[0] + ","+ d.path[1]+")scale(" + 1 + ")"; 
+						};                
+			 		});
+			}
 
 			// Bring up position of summary section
-		 d3.select(container+ ' .map svg').transition().duration(1000).attr('height', width * 0.65);
+			d3.select(container+ ' .map svg').transition().duration(1000).attr('height', width * 0.65);
 			
 			var mapScale = width/(oldMapWidth)// +  chPadding.right + chPadding.left);
 		
-			parentGroup.attr("transform", function(d) { 
-				return "translate("+chPadding.left/2+","+chPadding.top+")scale("+ mapScale +")"
-			})
-		 d3.select(container+' .smallstates')
+			// parentGroup.attr("transform", function(d) { 
+			// 	return "translate("+chPadding.left/2+","+chPadding.top+")scale("+ mapScale +")"
+			// })
+		 	d3.select(container+' .smallstates')
 				.transition().duration(200)
 				.style('opacity', 1)
-	
-		} else { // Individual states views
+		
+			if (opts.world){
+				
+				parentGroup.selectAll('g.no')
+					.style('opacity',1)
+					.style('display','block');
+			}
+
+		// Individual states views
+		} else { 
 
 			// parentGroup.attr("transform", function(d) { 
-			// 	return "translate("+chPadding.left+","+chPadding.top+")scale(1)"
-			// })
+			// 	return "translate("+chPadding.left/2+","+chPadding.top+")scale("+ mapScale +")"
+			// });
+
 		 d3.select(container+' .smallstates')
 				.transition().duration(200)
 				.style('opacity', 0)
-
-			var IDEAL_WIDTH = 38,
-				padding = width < 500 ? 20 : 10,
-				block = width < 500?  65 : 65;
+			if (opts.world){
+				var IDEAL_WIDTH = width < 500 ? 40 : 45,
+					padding = width < 500 ? 10 : 9,
+					block = width < 500? 75 : 90;
+			} else {
+				var IDEAL_WIDTH = 38,
+					padding = width < 500 ? 20 : 10,
+					block = width < 500?  65 : 65;
+			}
 		
 			// State paths
 			var step = 0,
 				w = 0,
 				count = 0;
-		
+
+			if (width < 500){
+				var mobile = 0.85;
+			} else {
+				var mobile = 1;
+			}
 			// Reposition and scale groups
 			group
 			 	.transition().duration(1800)
@@ -355,7 +429,7 @@ var mapList = async function(container, opts) {
 						w = w + block *1.1 + padding;
 						count += 1
 					}
-					if (w >= width){
+					if (w >= (width* mobile)){
 						step += 1;
 						w = 0;
 						count = 0;
@@ -385,23 +459,39 @@ var mapList = async function(container, opts) {
 				.attr('opacity', 1)
 				.style('stroke-width',0)
 			
+			if (opts.world){
+				// Yes lables 
+				var stepYes = 0,
+					wYes = 0,
+					countYes = 0;
+
+				parentGroup.selectAll('g.no')
+					.style('opacity',0)
+					.style('display','none')
+			}
+
 			categories 	
 			 	.attr('transform', function(d, i){
 					if (i > 0) { 
+						if (opts.world && d.status == 'yes'){wYes = wYes + block *1.1 + padding;}
 						w = w + block *1.1 + padding;
 						count += 1
 					}
-					if (w >= width){
+					if (w >= (width * mobile)){
+						if (opts.world && dataObject[d.id]){stepYes +=1;}
 						step += 1;
 						w = 0;
 						count = 0;
 					}
-					return "translate(" + (block * 1.1 * count+ padding)  + "," + ((step * block)-5)  +")"; 
+					return  "translate(" + (block * 1.1 * count+ padding)  + "," + ((step * block)-5)  +")"; 
 				})
 				.transition().duration(500).delay(800)
 				.style('opacity', 1)
-
-		 d3.select(container+ ' .map svg').transition().attr('height', ((step+ 1) * block ));
+			if (opts.world){
+		 		d3.select(container+ ' .map svg').transition().attr('height', ((stepYes+ 1) * block ));
+			} else {
+				d3.select(container+ ' .map svg').transition().attr('height', ((step+ 1) * block ));
+			}
 		}
 	}
 
@@ -424,6 +514,31 @@ var mapList = async function(container, opts) {
 	// 	return a.date - b.date;
 	// });
 
+	function wrap(text, width) {
+		var i = 0;
+		text.each(function() {	
+			var text = d3.select(this),
+				i = 1,
+				words = text.text().split(/\s+/).reverse(),
+				word,
+				line = [],
+				lineNumber = 0,
+				lineHeight = 1.1, // ems
+				y = text.attr("y"),
+				dy = parseFloat(text.attr("dy")),
+				tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+				while (word = words.pop()) {
+					line.push(word);
+					tspan.text(line.join(" "));
+					line.pop();
+					tspan.text(line.join(" "));
+					line = [word];
+					tspan = text.append("tspan").attr("x", 0).attr("y", i * -15).text(word);
+					if (word.length > 1) {i = i - 1; };
+				}
+			});
+	}
+
 	var buttons = d3.selectAll(container + ' li.button');
 
 	buttons.on('click',function(d){
@@ -433,17 +548,16 @@ var mapList = async function(container, opts) {
 		d3.select(this).classed("active", !d3.select(this).classed("active"))
 		render(width);
 	});
-
 	// First click 
+
 	setTimeout(function(){
-	 d3.select(container +' .button-group .first').dispatch("click");
+		d3.select(container +' .button-group .first').dispatch("click");
 	},200);
 
 	// return {
-		// return things here?
+	// 	return things here?
 	// }
 }
-
 
 function is_touch_device() {
     return 'ontouchstart' in window // works on most browsers 

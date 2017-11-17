@@ -2,7 +2,7 @@
 
 	@mobile-max: 450px;
 	position: relative;
-	max-width: 600px;
+	max-width: 700px;
     text-align: center;
     margin-bottom: 40px;
     margin-top: 35px;
@@ -40,7 +40,7 @@
 			color: #000;
 			font-size: 12px;
 			display: inline-block;
-			margin: 3px;
+			margin: 6px 3px;
 			
 			span.block {
 				display: inline-block;
@@ -55,16 +55,18 @@
 				vertical-align: middle;
 				font-size: 13px;
     			font-weight: 200;
+    			font-family: "franklin-gothic-urw", Helvetica, Arial, sans-serif;
 			}
 		}
 	}
 	
 	.button-group{
-		margin: 0px 0px 20px 0px;
+		margin: 0px 0px 0px 0px;
+    	padding-bottom: 20px;
 	}
-	 ul {
+	ul {
 		margin: 0 auto;
-		padding: 32px 0 0px 0;
+		padding: 20px 0 0px 0;
 	}
 	.button-group > li {
 		margin: 0;
@@ -75,7 +77,6 @@
 		border-style: solid;
 		border-width: 1px;
 		cursor: pointer;
-		font-weight: normal;
 		line-height: normal;
 		position: relative;
 		text-decoration: none;
@@ -90,13 +91,17 @@
 		color: #000;
 		transition: background-color 300ms ease-out;
 		margin-left: -5px;
-		font-weight: bold;
+		font-weight: 500;
 	}
 	.button:hover, .button:focus {
 		background-color: #ddd;
 	}
 	.button.active {
 		background: #ddd;
+	}
+
+	.map {
+		border-top: 1px solid #999;
 	}
 	
 	@media (max-width: 500px) {
@@ -116,7 +121,7 @@
 	
 	path.state {
 		fill: #fff;
-		stroke-width: 2;
+		stroke-width: 1.2;
 		stroke: #fff;
 		 -webkit-transition: opacity 0.5s ease-in-out;
     	-moz-transition: opacity 0.5s ease-in-out;
@@ -142,7 +147,7 @@
 	}
 	
 	.summary {
-		padding: 0px 20px 20px 20px;
+		//padding: 0px 20px 20px 20px;
 		font-size: 18px;
 		width: auto;
 		margin: 0 auto;
